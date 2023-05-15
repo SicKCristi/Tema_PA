@@ -27,10 +27,10 @@ void afisare_lista_echipe(lista_echipe *lista)
         lista=lista->next;
     }
 }
-void afisare_lista_echipe_pt_fisier(lista_echipe *lista)
+void afisare_lista_echipe_pt_fisier(lista_echipe *lista,char *nume_fisier)
 {
     FILE *f;
-    f=fopen("r.out","wt");
+    f=fopen(nume_fisier,"wt");
     if(f==NULL)
     {
         printf("FIsierul de output nu a putut fi deschis!\n");
@@ -41,7 +41,6 @@ void afisare_lista_echipe_pt_fisier(lista_echipe *lista)
         fprintf(f,"%s\n",lista->informatii_echipa.nume_echipa);
         lista=lista->next;
     }
-    fprintf(f,"\n");
     fclose(f);
 }
 lista_jucatori *creare_jucator(char *nume,char *prenume,int puncte)
@@ -53,7 +52,6 @@ lista_jucatori *creare_jucator(char *nume,char *prenume,int puncte)
     strcpy(aux->informatii_jucator.prenume,prenume);
     aux->informatii_jucator.punctaj=puncte;
     aux->next=NULL;
-    ///afisare_lista_jucatori(aux);
     return aux;
 }
 void inserare_jucator(lista_jucatori **lista,char *nume,char *prenume,int puncte)
@@ -76,8 +74,6 @@ lista_echipe *creare_echipa(char *nume_echipa,float medie,int nr_jucatori,lista_
     aux->informatii_echipa.nr_membrii=nr_jucatori;
     aux->informatii_echipa.jucatori_din_echipa=lista;
     aux->next=NULL;
-    ///printf("%s %d\n",aux->informatii_echipa.nume_echipa,aux->informatii_echipa.nr_membrii);
-    /*afisare_lista_jucatori(aux->informatii_echipa.jucatori_din_echipa);*/
     return aux;
 }
 void inserare_echipa(lista_echipe **lista,char *nume_echipa,float medie,int nr_jucatori,lista_jucatori *player_list)
@@ -141,10 +137,10 @@ void stergere_lista_echipe_fara_lista_de_jucatori(lista_echipe **lista)
        aux1=aux2;
    }
 }
-void citire_taskuri(int *taskuri)
+void citire_taskuri(int *taskuri, char *nume_fisier)
 {
     FILE *f;
-    f=fopen("c.in","rt");
+    f=fopen(nume_fisier,"rt");
     if(!f)
     {
         printf("Fisierul pentru checker nu poate fi deschis!\n");
@@ -172,13 +168,17 @@ void fmm_backslash_n_la_final(lista_echipe **lista)
     {
         if(aux->informatii_echipa.nume_echipa[strlen(aux->informatii_echipa.nume_echipa)-1]=='\n')
             aux->informatii_echipa.nume_echipa[strlen(aux->informatii_echipa.nume_echipa)-1]='\0';
+        if(aux->informatii_echipa.nume_echipa[strlen(aux->informatii_echipa.nume_echipa)-1]=='\r')
+            aux->informatii_echipa.nume_echipa[strlen(aux->informatii_echipa.nume_echipa)-1]='\0';
+        if(aux->informatii_echipa.nume_echipa[strlen(aux->informatii_echipa.nume_echipa)-1]==' ')
+            aux->informatii_echipa.nume_echipa[strlen(aux->informatii_echipa.nume_echipa)-1]='\0';
         aux=aux->next;
     }
 }
-void taskul1(lista_echipe **lista_cu_echipe,int *nr_echipe)
+void taskul1(lista_echipe **lista_cu_echipe,int *nr_echipe, char *nume_fisier, char *nume_fisier_out)
 {
     FILE *f;
-    f=fopen("d.in","rt");
+    f=fopen(nume_fisier,"rt");
     if(!f)
     {
         printf("Fisierul cu datele de intrare nu poate fi deschis!\n");
@@ -230,7 +230,7 @@ void taskul1(lista_echipe **lista_cu_echipe,int *nr_echipe)
     }
     fclose(f);
     fmm_backslash_n_la_final(lista_cu_echipe);
-    afisare_lista_echipe_pt_fisier(*lista_cu_echipe);
+    afisare_lista_echipe_pt_fisier(*lista_cu_echipe,nume_fisier_out);
 }
 int puterea_maxima_a_lui_doi(int nr_echipe)
 {
@@ -270,7 +270,7 @@ void eliminare_echipe_cu_punctaj_minim_din_stiva(lista_echipe **lista,lista_echi
     stergere_lista_jucatori(&aux2->informatii_echipa.jucatori_din_echipa);
     free(aux2);
 }
-void taskul2(lista_echipe **lista,int dif)
+void taskul2(lista_echipe **lista,int dif, char *nume_fisier)
 {
     lista_echipe *aux;
     float minim;
@@ -283,15 +283,10 @@ void taskul2(lista_echipe **lista,int dif)
         while(aux!=NULL && dif>0)
         {
             if(dif==0)
-             {
-                 ///afisare_lista_echipe(*lista);
-                 return;
-             }
+                return;
             if(fabs(aux->informatii_echipa.punctaj_mediu-minim)<0.000001 && dif>0)
             {
-                ///printf("%s\n",aux->informatii_echipa.nume_echipa);
                 eliminare_echipe_cu_punctaj_minim_din_stiva(lista,aux);
-                ///printf("Eliminarea echipei %d a fost facuta cu succes!\n\n",nr);
                 dif--;
                 aux=*lista;
             }
@@ -301,7 +296,7 @@ void taskul2(lista_echipe **lista,int dif)
             nr++;
         }
     }
-    afisare_lista_echipe_pt_fisier(*lista);
+    afisare_lista_echipe_pt_fisier(*lista, nume_fisier);
 }
 coada_meciuri *creaza_coada()
 {
@@ -349,29 +344,29 @@ void adaugare_meci_in_coada(coada_meciuri *program,echipa t1,echipa t2)
     if(program->front==NULL)
      program->front=program->rear;
 }
-void afisare_program_meciuri_pt_fisier(coada_meciuri *program,int nr)
+void afisare_program_meciuri_pt_fisier(coada_meciuri *program,int nr, char *nume_fisier_out)
 {
     FILE *f;
-    f=fopen("r.out","at");
+    f=fopen(nume_fisier_out,"at");
     if(f==NULL)
     {
         printf("Fisierul nu a putut fi deschis!\n");
         exit(1);
     }
-    fprintf(f,"--- ROUND NO:%d\n",nr);
+    fprintf(f,"\n--- ROUND NO:%d\n",nr);
     head_to_head *aux=program->front;
     while(aux!=NULL)
     {
-        fprintf(f,"%-30s - %30s\n",aux->team1.nume_echipa,aux->team2.nume_echipa);
+        fprintf(f,"%-32s - %32s\n",aux->team1.nume_echipa,aux->team2.nume_echipa);
         aux=aux->next;
     }
     fprintf(f,"\n");
     fclose(f);
 }
-void afisare_lista_echipe_castigatorea_pt_fisier(lista_echipe *lista,int nr)
+void afisare_lista_echipe_castigatoare_pt_fisier(lista_echipe *lista,int nr,char *nume_fisier_out)
 {
     FILE *f;
-    f=fopen("r.out","at");
+    f=fopen(nume_fisier_out,"at");
     if(f==NULL)
     {
         printf("Fisierul nu a putut fi deschis!\n");
@@ -380,13 +375,12 @@ void afisare_lista_echipe_castigatorea_pt_fisier(lista_echipe *lista,int nr)
     fprintf(f,"WINNERS OF ROUND NO:%d\n",nr);
     while(lista!=NULL)
     {
-        fprintf(f,"%-30s - %6.2f\n",lista->informatii_echipa.nume_echipa,lista->informatii_echipa.punctaj_mediu);
+        fprintf(f,"%-33s -  %.2f\n",lista->informatii_echipa.nume_echipa,lista->informatii_echipa.punctaj_mediu);
         lista=lista->next;
     }
-    fprintf(f,"\n");
     fclose(f);
 }
-void taskul3(lista_echipe **lista,int *nr_echipe)
+void taskul3(lista_echipe **lista,int *nr_echipe, char *nume_fisier_out)
 {
     lista_echipe *aux=*lista;
     lista_echipe *ultimii_opt=NULL;
@@ -399,7 +393,7 @@ void taskul3(lista_echipe **lista,int *nr_echipe)
     int nr_runda=1;
     while(*nr_echipe>=2)
     {
-        afisare_program_meciuri_pt_fisier(program,nr_runda);
+        afisare_program_meciuri_pt_fisier(program,nr_runda,nume_fisier_out);
         head_to_head *aux1=program->front;
         if(*nr_echipe==8)
         {
@@ -410,9 +404,6 @@ void taskul3(lista_echipe **lista,int *nr_echipe)
                 inserare_echipa(&ultimii_opt,aux1->team2.nume_echipa,aux1->team2.punctaj_mediu,aux1->team2.nr_membrii,aux1->team2.jucatori_din_echipa);
                 aux1=aux1->next;
             }
-            /*printf("Afisarea ultimilor 8 supravietuitori!\n");
-            afisare_lista_echipe(ultimii_opt);
-            */
         }
         aux1=program->front;
         lista_echipe *castigatori=NULL;
@@ -431,7 +422,7 @@ void taskul3(lista_echipe **lista,int *nr_echipe)
             }
             aux1=aux1->next;
         }
-        afisare_lista_echipe_castigatorea_pt_fisier(castigatori,nr_runda);
+        afisare_lista_echipe_castigatoare_pt_fisier(castigatori,nr_runda,nume_fisier_out);
         if(*nr_echipe>8)
          stergere_lista_echipe(&invinsi);
         else
@@ -449,19 +440,15 @@ void taskul3(lista_echipe **lista,int *nr_echipe)
         *nr_echipe=(*nr_echipe)/2;
         nr_runda++;
     }
-    ///printf("A trecut de while!\n");
     *nr_echipe=8;
     *lista=ultimii_opt;
-    ///printf("A trecut de atribuire!\n");
-    ///printf("\n\n");
 }
 void iordine(FILE *f,Nod *root)
 {
     if(root!=NULL)
     {
         iordine(f,root->right);
-        fprintf(f,"%-30s - %6.2f\n",root->data.nume_echipa,root->data.punctaj_mediu);
-        ///printf("%d\n",root->height);
+        fprintf(f,"%-33s -  %.2f\n",root->data.nume_echipa,root->data.punctaj_mediu);
         iordine(f,root->left);
     }
 }
@@ -474,38 +461,53 @@ Nod* creare_nod_arbore(echipa team,int inaltime)
     root->right=NULL;
     return root;
 }
-Nod *inserare_in_BTS(Nod *root,int inaltime,echipa team)
+Nod *inserare_in_BST(Nod *root,int inaltime,echipa team)
 {
     if(root==NULL)
       return creare_nod_arbore(team,inaltime);
-    if(team.punctaj_mediu<root->data.punctaj_mediu)
-       root->left=inserare_in_BTS(root->left,inaltime+1,team);
+    if(fabs(root->data.punctaj_mediu-team.punctaj_mediu)<0.000001 && strcmp(root->data.nume_echipa,team.nume_echipa)>0)
+    {
+        echipa aux=root->data;
+        root->data=team;
+        root->right=inserare_in_BST(root->right,inaltime+1,aux);
+    }
+    else
+     if(team.punctaj_mediu<root->data.punctaj_mediu)
+       root->left=inserare_in_BST(root->left,inaltime+1,team);
      else
-       root->right=inserare_in_BTS(root->right,inaltime+1,team);
+       root->right=inserare_in_BST(root->right,inaltime+1,team);
     return root;
 }
-Nod *taskul4(lista_echipe *lista_cu_echipe)
+void stergere_arbore(Nod *root)
 {
-    afisare_lista_echipe(lista_cu_echipe);
+    if(root==NULL)
+     return;
+    stergere_arbore(root->left);
+    stergere_arbore(root->right);
+    free(root->data.nume_echipa);
+    free(root);
+}
+Nod *taskul4(lista_echipe *lista_cu_echipe,char *nume_fisier_out)
+{
     Nod *root=NULL;
     int inaltime=0;
-    root=inserare_in_BTS(root,inaltime,lista_cu_echipe->informatii_echipa);
+    root=inserare_in_BST(root,inaltime,lista_cu_echipe->informatii_echipa);
     lista_cu_echipe=lista_cu_echipe->next;
     int nr=2;
     while(lista_cu_echipe!=NULL)
     {
         inaltime=0;
-        inserare_in_BTS(root,inaltime,lista_cu_echipe->informatii_echipa);
+        inserare_in_BST(root,inaltime,lista_cu_echipe->informatii_echipa);
         lista_cu_echipe=lista_cu_echipe->next;
         nr++;
     }
     FILE *f;
-    if((f=fopen("r.out","at"))==NULL)
+    if((f=fopen(nume_fisier_out,"at"))==NULL)
     {
         printf("Fisierul nu a putut fi deschis!\n");
         exit(1);
     }
-    fprintf(f,"TOP 8 TEAMS:\n");
+    fprintf(f,"\nTOP 8 TEAMS:\n");
     iordine(f,root);
     fclose(f);
     return root;
@@ -513,15 +515,16 @@ Nod *taskul4(lista_echipe *lista_cu_echipe)
 int inaltime_arbore(Nod *root)
 {
     int inaltime_stanga,inaltime_dreapta;
+    if(root==NULL)
+     return 0;
     inaltime_stanga=inaltime_arbore(root->left);
     inaltime_dreapta=inaltime_arbore(root->right);
-    return 1+ ((inaltime_stanga>inaltime_dreapta) ? inaltime_stanga : inaltime_dreapta);
+    return 1+ ((inaltime_stanga>inaltime_dreapta) ? inaltime_stanga:inaltime_dreapta);
 }
 int indice_de_echilibru(Nod *root)
 {
     if(root==NULL)
      return 0;
-    printf("%d %d\n",inaltime_arbore(root->left),inaltime_arbore(root->right));
     return inaltime_arbore(root->left)-inaltime_arbore(root->right);
 }
 int maximul_dintre_doi_intregi(int a,int b)
@@ -558,24 +561,33 @@ Nod *rotatie_la_dreapta_stanga(Nod *z)
     z->right=rotatie_la_dreapta(z->right);
     return rotatie_la_stanga(z);
 }
-Nod* echilibrare_arbore(Nod *root)
+Nod *inserare_nod_in_AVL(Nod *root,echipa team)
 {
-    if(root==NULL)
-     return root;
-    int indicele_de_echilibru=indice_de_echilibru(root);
-    if(indicele_de_echilibru>1)
-    {
-        if(indice_de_echilibru(root->left)<0)
-            root->left=rotatie_la_stanga(root->left);
-        root=rotatie_la_dreapta(root);
-    }
-    else
-     if(indicele_de_echilibru<-1)
+     if(root==NULL)
      {
-        if(indice_de_echilibru(root->right)>0)
-            root->right=rotatie_la_dreapta(root->right);
-        root=rotatie_la_stanga(root);
-    }
+        root=(Nod*)malloc(sizeof(Nod));
+        root->data=team;
+        root->height=0;
+        root->left=root->right=NULL;
+        return root;
+     }
+    if(team.punctaj_mediu<root->data.punctaj_mediu)
+     root->left=inserare_nod_in_AVL(root->left,team);
+    else
+     if(team.punctaj_mediu>root->data.punctaj_mediu)
+      root->right=inserare_nod_in_AVL(root->right,team);
+    else
+      return root;
+    root->height=1+maximul_dintre_doi_intregi(inaltime_arbore(root->left),inaltime_arbore(root->right));
+    int indicele_de_echilibru=inaltime_arbore(root->left)-inaltime_arbore(root->right);
+    if(indicele_de_echilibru>1 && team.punctaj_mediu<root->left->data.punctaj_mediu)
+      return rotatie_la_dreapta(root);
+    if(indicele_de_echilibru<-1 && team.punctaj_mediu>root->right->data.punctaj_mediu)
+      return rotatie_la_dreapta(root);
+    if(indicele_de_echilibru<1 && team.punctaj_mediu>root->left->data.punctaj_mediu)
+      return rotatie_la_dreapta_stanga(root);
+    if(indicele_de_echilibru<-1 && team.punctaj_mediu<root->right->data.punctaj_mediu)
+       return rotatie_la_stanga_dreapta(root);
     return root;
 }
 void afisare_echipe_de_pe_nivelul_2(FILE *f,Nod *root)
@@ -583,36 +595,31 @@ void afisare_echipe_de_pe_nivelul_2(FILE *f,Nod *root)
     if(root!=NULL)
     {
         afisare_echipe_de_pe_nivelul_2(f,root->left);
-        if(root->height==2)
-         fprintf(f,"%s\n",root->data.nume_echipa);
+        ///if(root->height==2)
+        fprintf(f,"%s\n",root->data.nume_echipa);
+        ///printf("%s %d\n",root->data.nume_echipa,root->height);
         afisare_echipe_de_pe_nivelul_2(f,root->right);
     }
 }
-void stergere_arbore(Nod *root)
+void taskul5(lista_echipe *lista_cu_echipe,char *nume_fisier_out)
 {
-    if(root==NULL)
-     return;
-    stergere_arbore(root->left);
-    stergere_arbore(root->right);
-    free(root->data.nume_echipa);
-    stergere_lista_jucatori(&root->data.jucatori_din_echipa);
-    free(root);
-}
-Nod *taskul5(Nod *root)
-{
-     printf("Macar intra in functie!\n");
-     root=echilibrare_arbore(root);
-     printf("A trecut de echilibrare!\n");
+     lista_echipe *aux=lista_cu_echipe;
+     Nod *root=NULL;
+     while(aux!=NULL)
+     {
+         root=inserare_nod_in_AVL(root,lista_cu_echipe->informatii_echipa);
+         aux=aux->next;
+     }
      FILE *f;
-     f=fopen("r.out","at");
+     f=fopen(nume_fisier_out,"at");
      if(f==NULL)
      {
         printf("Fisierul nu a putut fi deschis!\n");
         exit(1);
      }
+     fprintf(f,"\n");
      fprintf(f,"THE LEVEL 2 TEAMS ARE:\n");
      afisare_echipe_de_pe_nivelul_2(f,root);
      fclose(f);
      stergere_arbore(root);
-     return NULL;
 }
