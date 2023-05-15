@@ -197,7 +197,7 @@ void taskul1(lista_echipe **lista_cu_echipe,int *nr_echipe, char *nume_fisier, c
         aux=alocare_text(aux,LMAX);
         head=NULL;
         p=strtok(buffer," ");
-        nr_participanti=atoi(buffer);
+        nr_participanti=atoi(p);
         p=strtok(NULL," ");
         aux[0]='\0';
         while(p)
