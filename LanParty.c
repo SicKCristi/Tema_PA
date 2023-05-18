@@ -29,7 +29,10 @@ int main(int argc, char *argv[])
         ///afisare_lista_echipe(lista_cu_echipe);
     }
     if(taskuri[3]==1)
-      root=taskul4(lista_cu_echipe,argv[3]);
+      {
+        root=taskul4(lista_cu_echipe,argv[3]);
+        iordine_modificata(root);
+      }
     if(taskuri[4]==1)
       taskul5(lista_cu_echipe,argv[3]);
     free(taskuri);

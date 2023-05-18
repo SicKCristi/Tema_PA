@@ -590,14 +590,41 @@ Nod *inserare_nod_in_AVL(Nod *root,echipa team)
        return rotatie_la_stanga_dreapta(root);
     return root;
 }
+/*Nod *balansare_BST(Nod *root)
+{
+    int indicele_de_echilibru=inaltime_arbore(root->left)-inaltime_arbore(root->right);
+    if(root!=NULL)
+    {
+        if(indicele_de_echilibru>1 && team.punctaj_mediu<root->left->data.punctaj_mediu)
+            return rotatie_la_dreapta(root);
+        if(indicele_de_echilibru<-1 && team.punctaj_mediu>root->right->data.punctaj_mediu)
+            return rotatie_la_dreapta(root);
+        if(indicele_de_echilibru<1 && team.punctaj_mediu>root->left->data.punctaj_mediu)
+            return rotatie_la_dreapta_stanga(root);
+        if(indicele_de_echilibru<-1 && team.punctaj_mediu<root->right->data.punctaj_mediu)
+            return rotatie_la_stanga_dreapta(root);
+        balansare_BST(root->left);
+        balansare_BST(root->rght);
+    }
+    return root;
+}*/
+void iordine_modificata(Nod *root)
+{
+    if(root!=NULL)
+    {
+        iordine_modificata(root->right);
+        ///printf("%d\n",root->height);
+        iordine_modificata(root->left);
+    }
+}
 void afisare_echipe_de_pe_nivelul_2(FILE *f,Nod *root)
 {
     if(root!=NULL)
     {
         afisare_echipe_de_pe_nivelul_2(f,root->left);
-        ///if(root->height==2)
-        fprintf(f,"%s\n",root->data.nume_echipa);
-        ///printf("%s %d\n",root->data.nume_echipa,root->height);
+        if(root->height==2)
+            fprintf(f,"%s\n",root->data.nume_echipa);
+        ///printf("%d\n",root->height);
         afisare_echipe_de_pe_nivelul_2(f,root->right);
     }
 }
