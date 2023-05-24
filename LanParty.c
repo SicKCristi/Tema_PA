@@ -13,28 +13,19 @@ int main(int argc, char *argv[])
     Nod *root=NULL;
     int nr_echipe=0;
     if(taskuri[0]==1)
-    {
-          taskul1(&lista_cu_echipe,&nr_echipe,argv[2],argv[3]);
-          ///afisare_lista_echipe(lista_cu_echipe);
-    }
+        taskul1(&lista_cu_echipe,&nr_echipe,argv[2],argv[3]);
     if(taskuri[1]==1)
     {
         taskul2(&lista_cu_echipe,nr_echipe-puterea_maxima_a_lui_doi(nr_echipe),argv[3]);
-        ///afisare_lista_echipe(lista_cu_echipe);
         nr_echipe=puterea_maxima_a_lui_doi(nr_echipe);
     }
     if(taskuri[2]==1)
-    {
         taskul3(&lista_cu_echipe,&nr_echipe,argv[3]);
-        ///afisare_lista_echipe(lista_cu_echipe);
-    }
     if(taskuri[3]==1)
-      {
-        root=taskul4(lista_cu_echipe,argv[3]);
-        iordine_modificata(root);
-      }
+        taskul4(&lista_cu_echipe,argv[3]);
     if(taskuri[4]==1)
-      taskul5(lista_cu_echipe,argv[3]);
+        taskul5(lista_cu_echipe,argv[3]);
     free(taskuri);
+    stergere_lista_echipe(&lista_cu_echipe);
     return 0;
 }
