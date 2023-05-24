@@ -43,5 +43,6 @@ Nod *rotatie_la_dreapta_stanga(Nod *z);
 Nod* echilibrare_arbore(Nod *root);
 void stergere_arbore(Nod *root);
 void iordine_modificata(Nod *root);
-void afisare_echipe_de_pe_nivelul_2(FILE *f,Nod *root);
+void afisare_echipe_de_pe_nivelul_2(FILE *f,lista_echipe *lista_cu_echipe);
+/// void afisare_echipe_de_pe_nivelul_2(FILE *f,Nod *root);
 void taskul5(lista_echipe *lista_cu_echipe,char *nume_fisier_out);
